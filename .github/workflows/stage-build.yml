@@ -1,0 +1,29 @@
+### This is the Terraform-generated dev-build.yml workflow for the archival-packaging-tool-stage app repository ###
+### If this is a Lambda repo, uncomment the FUNCTION line at the end of the document     ###
+### If the container requires any additional pre-build commands, uncomment and edit      ###
+### the PREBUILD line at the end of the document.                                        ###
+name: Stage Container Build and Deploy
+
+# checkov:skip=CKV2_GHA_1:The shared workflow contains the permissions constraints
+# NOTE: The above checkov skip command doesn't actually work and this workflow
+#       will always show a checkov warning.
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '.github/**'
+
+jobs:
+  deploy:
+    name: Stage Container Deploy
+    uses: mitlibraries/.github/.github/workflows/ecr-shared-deploy-stage.yml@main
+    secrets: inherit
+    with:
+      AWS_REGION: "us-east-1"
+      GHA_ROLE: "archival-packaging-tool-gha-stage"
+      ECR: "archival-packaging-tool-stage"
+      FUNCTION: "archival-packaging-tool-stage"
+      # PREBUILD: 
