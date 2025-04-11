@@ -5,6 +5,10 @@ name = "pypi"
 
 [packages]
 sentry-sdk = "*"
+bagit = "*"
+setuptools = "*"
+boto3 = "*"
+smart-open = {extras = ["s3"], version = "*"}
 
 [dev-packages]
 black = "*"
