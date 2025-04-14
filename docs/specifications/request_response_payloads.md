@@ -7,6 +7,10 @@ This tool will be deployed as an AWS Lambda, and the expected primary way of inv
 Example JSON payload sent via a `POST` request:
 ```json
 {
+    "metadata": {
+      "Contact-Name": "Winding River",
+      "External-Identifier": "abc123"
+    },
     "input_files": [
         {
             "s3_uri": "s3://my-bucket/apt-testing/dogs.tiff",
@@ -36,7 +40,7 @@ Example JSON payload sent via a `POST` request:
 }
 ```
 ### Fields
-
+- `metadata`: **OPTIONAL** object of key:value pairs that getting written as metadata to `bagit-info.txt`
 - `input_files`: **REQUIRED** array of objects that define what files should be downloaded and added to the final bagit zipfile
   - `s3_uri`: **REQUIRED** location to download the file from
   - `filepath`: **REQUIRED** desired final filepath in the bagit zip file, relative to the root of the bag    - 
