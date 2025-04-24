@@ -31,7 +31,7 @@ Example JSON payload sent via a `POST` request:
             }
         }
     ],
-    "checksums":[
+    "checksums_to_generate":[
       "md5",
       "sha256"
     ],
@@ -50,7 +50,7 @@ Example JSON payload sent via a `POST` request:
     - If included, an error will be raised if the checksums generated during creation of the bag do not match this checksum
     - Only checked if the checksum algorithm in this object is also included in the request root `checksums` field as well, instructing Bagit to generate a checksum for those algorithms
     - If the checksum algorithm does not match a supported algorithm as defined below an error will be raised
-- `checksums`: **OPTIONAL** list of checksums for the bagit library to create for each file when creating the bag
+- `checksums_to_generate`: **OPTIONAL** list of checksums for the bagit library to create for each file when creating the bag
   - Default: `["md5", "sha256"]`
   - Supported checksums (as influenced by the underlying [python bagit library](https://github.com/LibraryOfCongress/bagit-python)): `[blake2b, blake2s, md5, sha1, sha224, sha256, sha3_224, sha3_256, sha3_384, sha3_512, sha384, sha512, shake_128, shake_256]`
 - `output_zip_s3_uri`: **REQUIRED** location where the final bagit zipfile will be written to
