@@ -14,6 +14,7 @@ pre-commit = "*"
 pytest = "*"
 ruff = "*"
 ipython = "*"
+pip-audit = "*"
 
 [requires]
 python_version = "3.12"
