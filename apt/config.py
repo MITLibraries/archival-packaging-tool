@@ -82,12 +82,7 @@ def configure_logger(
 
 def configure_dev_logger(
     warning_only_loggers: str = ",".join(  # noqa: FLY002
-        [
-            "asyncio",
-            "botocore",
-            "urllib3",
-            "boto3",
-        ]
+        ["asyncio", "botocore", "urllib3", "boto3", "smart_open"]
     ),
 ) -> None:
     """Invoke to setup DEBUG level console logging for development work."""

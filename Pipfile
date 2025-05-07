@@ -4,17 +4,21 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+bagit = "*"
+boto3 = "*"
 sentry-sdk = "*"
+setuptools = "*"
+smart-open = {extras = ["s3"], version = "*"}
 
 [dev-packages]
 black = "*"
 coveralls = "*"
+ipython = "*"
 mypy = "*"
+pip-audit = "*"
 pre-commit = "*"
 pytest = "*"
 ruff = "*"
-ipython = "*"
-pip-audit = "*"
 
 [requires]
 python_version = "3.12"
