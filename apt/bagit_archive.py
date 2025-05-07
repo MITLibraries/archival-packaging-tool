@@ -28,9 +28,14 @@ class BagitArchive:
         bag_metadata: dict | None = None,
     ):
         self.bag_metadata = bag_metadata or {"Contact-Name": "Default Contact"}
-
         self.bag = None
-        self.bag_path: Path | None = None
+
+    @property
+    def bag_path(self) -> Path:
+        """Get path from created Bagit instance."""
+        if not self.bag:
+            raise AttributeError("Bagit instance has not yet been created.")
+        return Path(self.bag.path)
 
     def process(
         self,
@@ -57,6 +62,8 @@ class BagitArchive:
         }
 
         try:
+            # NOTE: Eventually this TemporaryDirectory will be explicitly located in the
+            #   Lambda's EFS mount
             with tempfile.TemporaryDirectory() as temp_bag_dir:
                 temp_dir_path = Path(temp_bag_dir)
 
@@ -74,7 +81,7 @@ class BagitArchive:
                 self.create_zip(local_zip_path, compress=compress_zip)
 
                 # upload Bag zip file to target location
-                self.upload_file(local_zip_path, output_zip_uri)
+                self.upload_bag_to_s3(local_zip_path, output_zip_uri)
 
                 # prepare results
                 result["success"] = True
@@ -88,22 +95,28 @@ class BagitArchive:
         logger.debug(f"Bag created, elapsed: {result['elapsed']}")
         return result
 
-    def download_file(self, source_uri: str, target_path: str | Path) -> Path:
-        """Download a file from source URI to target path.
+    def download_file(self, remote_uri: str, local_target_path: str | Path) -> Path:
+        """Download a file to be included in the bag.
+
+        Most commonly, this will be downloading a file from S3 and saving it locally
+        in the working directory of the Bag, with the desired relative filepath of the
+        file to the final Bag.
 
         Args:
-            source_uri: Source URI (local path or s3://bucket/key)
-            target_path: Path where to save the file
+            remote_uri: Remote URI of file to download (local path or s3://bucket/key)
+            local_target_path: Path where to save the file
         """
-        target_path = Path(target_path)
-        stream_file_transfer(source_uri, target_path)
-        return target_path
+        local_target_path = Path(local_target_path)
+        stream_file_transfer(remote_uri, local_target_path)
+        return local_target_path
 
     def download_files(self, input_files: list[dict], bag_dir: Path) -> list[Path]:
         """Download files from source URIs to temporary bag location.
 
         Args:
             input_files: List of dicts with 'uri' and 'filepath'
+                - 'uri' is where to download the file from
+                - 'filepath' is relative path of the file in the final Bag
             bag_dir: Root directory of Bag
         """
         logger.info(f"Downloading {len(input_files)} files to {bag_dir}")
@@ -133,7 +146,6 @@ class BagitArchive:
         logger.info(f"Creating bag with checksums: {checksums}")
         bag = bagit.make_bag(bag_dir, self.bag_metadata, checksums=checksums)
         self.bag = bag
-        self.bag_path = bag_dir
         return bag
 
     def validate_checksums(
@@ -202,17 +214,17 @@ class BagitArchive:
 
         return output_path
 
-    def upload_file(self, local_path: str | Path, remote_uri: str) -> str:
-        """Upload a file to a remote location.
+    def upload_bag_to_s3(self, local_zip_path: str | Path, output_zip_uri: str) -> str:
+        """Upload the single Bagit zip file to S3.
 
         Args:
-            local_path: Path to the local file
-            remote_uri: URI where to upload the file (e.g., s3://bucket/key)
+            local_zip_path: Path to the local Bagit zip file
+            output_zip_uri: URI where to upload the Bagit zip file (e.g., s3://bucket/key)
 
         Returns:
             Remote URI where the file was uploaded
         """
-        local_path = Path(local_path)
-        logger.info(f"Uploading Bagit zip file to '{remote_uri}'")
-        stream_file_transfer(local_path, remote_uri)
-        return remote_uri
+        local_path = Path(local_zip_path)
+        logger.info(f"Uploading Bagit zip file to '{output_zip_uri}'")
+        stream_file_transfer(local_path, output_zip_uri)
+        return output_zip_uri

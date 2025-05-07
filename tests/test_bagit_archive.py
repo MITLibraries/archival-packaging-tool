@@ -35,7 +35,6 @@ class TestBagitArchive:
     def test_init_defaults(self):
         bagit_archive = BagitArchive()
         assert bagit_archive.bag is None
-        assert bagit_archive.bag_path is None
 
     def test_init_custom_metadata(self):
         metadata = {"Contact-Name": "Test User", "Organization": "Test Org"}
@@ -111,7 +110,6 @@ class TestBagitArchive:
     def test_create_zip(self, tmp_path):
         bagit_archive = BagitArchive()
         bag = bagit.Bag("tests/fixtures/bags/hello-world-bag")
-        bagit_archive.bag_path = bag.path
         bagit_archive.bag = bag
 
         zip_path = tmp_path / "output.zip"
@@ -139,7 +137,7 @@ class TestBagitArchive:
         test_file = Path("tests/fixtures/bags/hello-world-bag.zip")
         target_uri = "s3://bucket/hello-world-bag.zip"
         with patch("apt.bagit_archive.stream_file_transfer") as mock_transfer:
-            result = bagit_archive.upload_file(test_file, target_uri)
+            result = bagit_archive.upload_bag_to_s3(test_file, target_uri)
             mock_transfer.assert_called_once_with(test_file, target_uri)
             assert result == target_uri
 
@@ -153,7 +151,7 @@ class TestBagitArchive:
             create_bag=MagicMock(return_value=bag),
             validate_checksums=MagicMock(),
             create_zip=MagicMock(return_value=tmp_path / "bag.zip"),
-            upload_file=MagicMock(return_value="s3://bucket/bag.zip"),
+            upload_bag_to_s3=MagicMock(return_value="s3://bucket/bag.zip"),
         ):
             result = bagit_archive.process(
                 [{"uri": "s3://input-bucket/hello.txt", "filepath": "hello.txt"}],
