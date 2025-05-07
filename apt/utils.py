@@ -5,6 +5,7 @@ from smart_open import smart_open  # type: ignore[import]
 
 logger = logging.getLogger(__name__)
 
+# size in megabytes (x * 1024 * 1024 = megabytes)
 DEFAULT_CHUNK_SIZE = 50 * 1024 * 1024
 
 
