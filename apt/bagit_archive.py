@@ -32,6 +32,62 @@ class BagitArchive:
         self.bag = None
         self.bag_path: Path | None = None
 
+    def process(
+        self,
+        input_files: list[dict],
+        output_zip_uri: str,
+        checksums: list[str] | None = None,
+        *,
+        compress_zip: bool = True,
+    ) -> dict[str, Any]:
+        """Create a new Bagit archive zip file and save to the specified URI.
+
+        Args:
+            input_files: List of dicts with 'uri', 'filepath', and optional 'checksums'
+            output_zip_uri: URI where to save the final zip file (local path or s3://bucket/key)
+            checksums: List of checksum algorithms to use
+            compress_zip: Whether to compress the zip file
+        """
+        start_time = time.perf_counter()
+        result: dict = {
+            "success": False,
+            "error": None,
+            "elapsed": 0,
+            "bag": {"entries": {}},
+        }
+
+        try:
+            with tempfile.TemporaryDirectory() as temp_bag_dir:
+                temp_dir_path = Path(temp_bag_dir)
+
+                # download input files
+                self.download_files(input_files, temp_dir_path)
+
+                # create Bag
+                bag = self.create_bag(temp_dir_path, checksums=checksums)
+
+                # validate any checksums passed with input files after Bag creation
+                self.validate_checksums(input_files, bag)
+
+                # create local Bag zip file
+                local_zip_path = Path(temp_bag_dir) / "bag.zip"
+                self.create_zip(local_zip_path, compress=compress_zip)
+
+                # upload Bag zip file to target location
+                self.upload_file(local_zip_path, output_zip_uri)
+
+                # prepare results
+                result["success"] = True
+                result["bag"]["entries"] = bag.entries
+
+        except Exception as e:
+            logger.exception("Error creating Bag zip file.")
+            result["error"] = str(e)
+
+        result["elapsed"] = time.perf_counter() - start_time
+        logger.debug(f"Bag created, elapsed: {result['elapsed']}")
+        return result
+
     def download_file(self, source_uri: str, target_path: str | Path) -> Path:
         """Download a file from source URI to target path.
 
@@ -160,59 +216,3 @@ class BagitArchive:
         logger.info(f"Uploading Bagit zip file to '{remote_uri}'")
         stream_file_transfer(local_path, remote_uri)
         return remote_uri
-
-    def process(
-        self,
-        input_files: list[dict],
-        output_zip_uri: str,
-        checksums: list[str] | None = None,
-        *,
-        compress_zip: bool = True,
-    ) -> dict[str, Any]:
-        """Create a new Bagit archive zip file and save to the specified URI.
-
-        Args:
-            input_files: List of dicts with 'uri', 'filepath', and optional 'checksums'
-            output_zip_uri: URI where to save the final zip file (local path or s3://bucket/key)
-            checksums: List of checksum algorithms to use
-            compress_zip: Whether to compress the zip file
-        """
-        start_time = time.perf_counter()
-        result: dict = {
-            "success": False,
-            "error": None,
-            "elapsed": 0,
-            "bag": {"entries": {}},
-        }
-
-        try:
-            with tempfile.TemporaryDirectory() as temp_bag_dir:
-                temp_dir_path = Path(temp_bag_dir)
-
-                # download input files
-                self.download_files(input_files, temp_dir_path)
-
-                # create Bag
-                bag = self.create_bag(temp_dir_path, checksums=checksums)
-
-                # validate any checksums passed with input files after Bag creation
-                self.validate_checksums(input_files, bag)
-
-                # create local Bag zip file
-                local_zip_path = Path(temp_bag_dir) / "bag.zip"
-                self.create_zip(local_zip_path, compress=compress_zip)
-
-                # upload Bag zip file to target location
-                self.upload_file(local_zip_path, output_zip_uri)
-
-                # prepare results
-                result["success"] = True
-                result["bag"]["entries"] = bag.entries
-
-        except Exception as e:
-            logger.exception("Error creating Bag zip file.")
-            result["error"] = str(e)
-
-        result["elapsed"] = time.perf_counter() - start_time
-        logger.debug(f"Bag created, elapsed: {result['elapsed']}")
-        return result

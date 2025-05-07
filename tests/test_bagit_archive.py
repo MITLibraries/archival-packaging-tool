@@ -33,29 +33,29 @@ class TestBagitArchive:
         ]
 
     def test_init_defaults(self):
-        ba = BagitArchive()
-        assert ba.bag is None
-        assert ba.bag_path is None
+        bagit_archive = BagitArchive()
+        assert bagit_archive.bag is None
+        assert bagit_archive.bag_path is None
 
     def test_init_custom_metadata(self):
         metadata = {"Contact-Name": "Test User", "Organization": "Test Org"}
-        ba = BagitArchive(bag_metadata=metadata)
-        assert ba.bag_metadata == metadata
+        bagit_archive = BagitArchive(bag_metadata=metadata)
+        assert bagit_archive.bag_metadata == metadata
 
     def test_download_file(self, tmp_path, sample_file_path):
-        ba = BagitArchive()
+        bagit_archive = BagitArchive()
         target_path = tmp_path / "target.txt"
 
         with patch("apt.bagit_archive.stream_file_transfer") as mock_transfer:
-            ba.download_file(str(sample_file_path), target_path)
+            bagit_archive.download_file(str(sample_file_path), target_path)
             mock_transfer.assert_called_once_with(str(sample_file_path), target_path)
 
     def test_download_files(self, tmp_path, input_files):
-        ba = BagitArchive()
+        bagit_archive = BagitArchive()
 
         with patch("apt.bagit_archive.BagitArchive.download_file") as mock_download:
             mock_download.return_value = Path("/fake/path")
-            result = ba.download_files(input_files, tmp_path)
+            result = bagit_archive.download_files(input_files, tmp_path)
 
             # Verify the method created the right paths
             mock_download.assert_called_once_with(
@@ -66,14 +66,14 @@ class TestBagitArchive:
             assert isinstance(result[0], Path)
 
     def test_create_bag(self, tmp_path):
-        ba = BagitArchive(bag_metadata={"Source-Organization": "Test Org"})
+        bagit_archive = BagitArchive(bag_metadata={"Source-Organization": "Test Org"})
 
         # create a directory with un-bagged contents
         bag_path = tmp_path
         shutil.copy("tests/fixtures/sample.txt", bag_path)
 
         # create a bag from that directory
-        result = ba.create_bag(bag_path)
+        result = bagit_archive.create_bag(bag_path)
 
         assert isinstance(result, bagit.Bag)
         assert result.path == str(bag_path)
@@ -81,7 +81,7 @@ class TestBagitArchive:
         assert (bag_path / "data/sample.txt").exists()
 
     def test_validate_checksums_success(self):
-        ba = BagitArchive()
+        bagit_archive = BagitArchive()
         mock_bag = MagicMock(spec=bagit.Bag)
         mock_bag.algorithms = ["md5", "sha256"]
         mock_bag.entries = {"data/file.txt": {"md5": "abc123", "sha256": "def456"}}
@@ -90,10 +90,10 @@ class TestBagitArchive:
             {"filepath": "file.txt", "checksums": {"md5": "abc123", "sha256": "def456"}}
         ]
 
-        ba.validate_checksums(input_files, mock_bag)
+        bagit_archive.validate_checksums(input_files, mock_bag)
 
     def test_validate_checksums_mismatch(self):
-        ba = BagitArchive()
+        bagit_archive = BagitArchive()
         mock_bag = MagicMock(spec=bagit.Bag)
         mock_bag.algorithms = ["md5", "sha256"]
         mock_bag.entries = {"data/file.txt": {"md5": "abc123", "sha256": "def456"}}
@@ -106,16 +106,16 @@ class TestBagitArchive:
         ]
 
         with pytest.raises(ValueError, match="Checksum mismatch for data/file.txt"):
-            ba.validate_checksums(input_files, mock_bag)
+            bagit_archive.validate_checksums(input_files, mock_bag)
 
     def test_create_zip(self, tmp_path):
-        ba = BagitArchive()
+        bagit_archive = BagitArchive()
         bag = bagit.Bag("tests/fixtures/bags/hello-world-bag")
-        ba.bag_path = bag.path
-        ba.bag = bag
+        bagit_archive.bag_path = bag.path
+        bagit_archive.bag = bag
 
         zip_path = tmp_path / "output.zip"
-        result = ba.create_zip(zip_path)
+        result = bagit_archive.create_zip(zip_path)
 
         assert result == zip_path
         assert zip_path.exists()
@@ -130,21 +130,21 @@ class TestBagitArchive:
             }
 
     def test_create_zip_no_bag(self):
-        ba = BagitArchive()
+        bagit_archive = BagitArchive()
         with pytest.raises(ValueError, match="No bag created yet"):
-            ba.create_zip("output.zip")
+            bagit_archive.create_zip("output.zip")
 
     def test_upload_file(self):
-        ba = BagitArchive()
+        bagit_archive = BagitArchive()
         test_file = Path("tests/fixtures/bags/hello-world-bag.zip")
         target_uri = "s3://bucket/hello-world-bag.zip"
         with patch("apt.bagit_archive.stream_file_transfer") as mock_transfer:
-            result = ba.upload_file(test_file, target_uri)
+            result = bagit_archive.upload_file(test_file, target_uri)
             mock_transfer.assert_called_once_with(test_file, target_uri)
             assert result == target_uri
 
     def test_process_success(self, tmp_path):
-        ba = BagitArchive(bag_metadata={"Source-Organization": "Test Org"})
+        bagit_archive = BagitArchive(bag_metadata={"Source-Organization": "Test Org"})
         bag = bagit.Bag("tests/fixtures/bags/hello-world-bag")
 
         with patch.multiple(
@@ -155,7 +155,7 @@ class TestBagitArchive:
             create_zip=MagicMock(return_value=tmp_path / "bag.zip"),
             upload_file=MagicMock(return_value="s3://bucket/bag.zip"),
         ):
-            result = ba.process(
+            result = bagit_archive.process(
                 [{"uri": "s3://input-bucket/hello.txt", "filepath": "hello.txt"}],
                 "s3://bucket/bag.zip",
             )
@@ -167,12 +167,12 @@ class TestBagitArchive:
             assert result["bag"]["entries"] == bag.entries
 
     def test_process_error(self):
-        ba = BagitArchive()
+        bagit_archive = BagitArchive()
 
         with patch.object(
             BagitArchive, "download_files", side_effect=Exception("Test error")
         ):
-            result = ba.process(
+            result = bagit_archive.process(
                 [{"uri": "s3://input-bucket/file.txt", "filepath": "file.txt"}],
                 "s3://bucket/bag.zip",
             )
