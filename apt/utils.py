@@ -29,7 +29,7 @@ def stream_file_transfer(
     logger.debug(f"Streaming file from '{source_uri}' to '{target_uri}'")
 
     # ensure parent directory exists for local target paths
-    if "://" not in target_uri and isinstance(target_uri, str):
+    if not target_uri.startswith("s3://"):
         target_path = Path(target_uri)
         target_path.parent.mkdir(parents=True, exist_ok=True)
 
