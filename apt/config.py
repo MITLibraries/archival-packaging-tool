@@ -13,6 +13,7 @@ class Config:
     REQUIRED_ENV_VARS = (
         "WORKSPACE",
         "SENTRY_DSN",
+        "CHALLENGE_SECRET",
     )
     OPTIONAL_ENV_VARS = ()
 

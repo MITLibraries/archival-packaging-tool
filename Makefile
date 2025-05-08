@@ -1,6 +1,8 @@
 SHELL=/bin/bash
 DATETIME:=$(shell date -u +%Y%m%dT%H%M%SZ)
 
+-include .env
+
 help: # Preview Makefile commands
 	@awk 'BEGIN { FS = ":.*#"; print "Usage:  make <target>\n\nTargets:" } \
 /^[-_[:alpha:]]+:.?*#/ { printf "  %-15s%s\n", $$1, $$2 }' $(MAKEFILE_LIST)
@@ -54,3 +56,18 @@ black-apply: # Apply changes with 'black'
 
 ruff-apply: # Resolve 'fixable errors' with 'ruff'
 	pipenv run ruff check --fix .
+
+
+####################################
+# SAM Lambda
+####################################
+sam-build: # Build SAM image for running Lambda locally
+	sam build --template tests/sam/template.yaml
+
+sam-http-run: # Run lambda locally as an HTTP server
+	sam local start-api --template tests/sam/template.yaml --env-vars tests/sam/env.json
+
+sam-http-ping: # Send curl command to SAM HTTP server
+	curl --location 'http://localhost:3000/apt' \
+	--header 'Content-Type: application/json' \
+	--data '{"action":"ping","challenge_secret":"$(CHALLENGE_SECRET)","verbose":true}'
