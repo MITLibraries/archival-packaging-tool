@@ -9,6 +9,7 @@ boto3 = "*"
 sentry-sdk = "*"
 setuptools = "*"
 smart-open = {extras = ["s3"], version = "*"}
+jsonschema = "*"
 
 [dev-packages]
 black = "*"
@@ -19,6 +20,7 @@ pip-audit = "*"
 pre-commit = "*"
 pytest = "*"
 ruff = "*"
+types-jsonschema = "*"
 
 [requires]
 python_version = "3.12"

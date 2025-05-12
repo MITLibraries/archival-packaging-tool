@@ -1,6 +1,10 @@
+# ruff: noqa: S106
+
 import json
 
 import pytest
+
+from apt.lambda_handler import InputPayload, LambdaProcessor
 
 
 @pytest.fixture(autouse=True)
@@ -48,3 +52,15 @@ def invalid_secret_event():
 @pytest.fixture
 def malformed_event():
     return {"body": "...", "requestContext": {"http": {"method": "POST"}}}
+
+
+@pytest.fixture
+def valid_input_payload():
+    """Valid InputPayload instance for testing."""
+    return InputPayload(action="ping", challenge_secret="test-secret", verbose=True)
+
+
+@pytest.fixture
+def lambda_processor():
+    """LambdaProcessor instance for testing."""
+    return LambdaProcessor()
