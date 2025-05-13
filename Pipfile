@@ -21,6 +21,7 @@ pre-commit = "*"
 pytest = "*"
 ruff = "*"
 types-jsonschema = "*"
+pytest-mock = "*"
 
 [requires]
 python_version = "3.12"

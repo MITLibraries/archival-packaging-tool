@@ -1,7 +1,7 @@
 import logging
 from pathlib import Path
 
-from smart_open import smart_open  # type: ignore[import]
+from smart_open import open  # type: ignore[import] # noqa: A004
 
 logger = logging.getLogger(__name__)
 
@@ -34,9 +34,7 @@ def stream_file_transfer(
         target_path.parent.mkdir(parents=True, exist_ok=True)
 
     total_bytes = 0
-    with smart_open(source_uri, "rb") as source_file, smart_open(
-        target_uri, "wb"
-    ) as target_file:
+    with open(source_uri, "rb") as source_file, open(target_uri, "wb") as target_file:
         while True:
             chunk = source_file.read(chunk_size)
             if not chunk:
