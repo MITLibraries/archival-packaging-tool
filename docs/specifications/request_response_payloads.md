@@ -7,24 +7,26 @@ This tool will be deployed as an AWS Lambda, and the expected primary way of inv
 Example JSON payload sent via a `POST` request:
 ```json
 {
+    "challenge_secret": "abc123def456",
+    "verbose": true,
     "metadata": {
       "Contact-Name": "Winding River",
       "External-Identifier": "abc123"
     },
     "input_files": [
         {
-            "s3_uri": "s3://my-bucket/apt-testing/dogs.tiff",
+            "uri": "s3://my-bucket/apt-testing/dogs.tiff",
             "filepath": "dogs.tiff",            
             "checksums":{
               "sha256": "23bcd2d83d4c0f270640ec65cbeb61a1784856255c3c98dd25ec340453458348s",
             }
         },
 				{
-            "s3_uri": "s3://another-bucket/apt-testing/CATS.PDF",
+            "uri": "s3://another-bucket/apt-testing/CATS.PDF",
             "filepath": "cats.pdf"            
         },
         {
-            "s3_uri": "s3://my-bucket/apt-testing/metadata.csv",
+            "uri": "s3://my-bucket/apt-testing/metadata.csv",
             "filepath": "metadata/metadata.csv",            
             "checksums":{
               "md5": "9f81f3c07476a0d97f6793673dd8e475"
@@ -40,9 +42,11 @@ Example JSON payload sent via a `POST` request:
 }
 ```
 ### Fields
+- `challenge_secret`: **REQUIRED** shared, secret string confirmed by the Lambda before processing request
+- `verbose`: **OPTIONAL** boolean for verbose logging and response
 - `metadata`: **OPTIONAL** object of key:value pairs that getting written as metadata to `bagit-info.txt`
 - `input_files`: **REQUIRED** array of objects that define what files should be downloaded and added to the final bagit zipfile
-  - `s3_uri`: **REQUIRED** location to download the file from
+  - `uri`: **REQUIRED** location to download the file from
   - `filepath`: **REQUIRED** desired final filepath in the bagit zip file, relative to the root of the bag    - 
     - e.g. `hello.txt` will end up at `/data/hello.txt` in the final bag, where `my/custom/path/goodbye.txt` would end up date`/data/my/custom/path/goodbye.txt`
     - This provides a way to rename (filename) and organize (path) the file that was downloaded and written to the bag.

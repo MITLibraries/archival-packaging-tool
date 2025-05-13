@@ -1,0 +1,89 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Lambda Request Payload Schema",
+  "description": "Schema for validating the request payload sent to the Lambda function",
+  "type": "object",
+  "required": [
+    "input_files",
+    "output_zip_s3_uri"
+  ],
+  "properties": {
+    "verbose": {
+      "type": "boolean",
+      "description": "Flag for verbose logging and response",
+      "default": false
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Key-value pairs that get written as metadata to bagit-info.txt",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "input_files": {
+      "type": "array",
+      "description": "Array of objects that define what files should be downloaded and added to the final bagit zipfile",
+      "items": {
+        "type": "object",
+        "required": [
+          "uri",
+          "filepath"
+        ],
+        "properties": {
+          "uri": {
+            "type": "string",
+            "description": "Location to download the file from"
+          },
+          "filepath": {
+            "type": "string",
+            "description": "Desired final filepath in the bagit zip file, relative to the root of the bag"
+          },
+          "checksums": {
+            "type": "object",
+            "description": "Object of checksum name to checksum value pairs",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "checksums_to_generate": {
+      "type": "array",
+      "description": "List of checksums for the bagit library to create for each file when creating the bag",
+      "default": [
+        "md5",
+        "sha256"
+      ],
+      "items": {
+        "type": "string",
+        "enum": [
+          "blake2b",
+          "blake2s",
+          "md5",
+          "sha1",
+          "sha224",
+          "sha256",
+          "sha3_224",
+          "sha3_256",
+          "sha3_384",
+          "sha3_512",
+          "sha384",
+          "sha512",
+          "shake_128",
+          "shake_256"
+        ]
+      }
+    },
+    "output_zip_s3_uri": {
+      "type": "string",
+      "description": "Location where the final bagit zipfile will be written to"
+    },
+    "compress_zip": {
+      "type": "boolean",
+      "description": "Boolean to use compression when creating the Bagit zipfile",
+      "default": true
+    }
+  },
+  "additionalProperties": true
+}

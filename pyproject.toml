@@ -12,6 +12,9 @@ exclude = ["tests/", "output/"]
 
 [tool.pytest.ini_options]
 log_level = "INFO"
+filterwarnings = [
+    "ignore::DeprecationWarning:bagit:",
+]
 
 [tool.ruff]
 target-version = "py312"
@@ -39,6 +42,7 @@ ignore = [
     "D103",
     "D104",
     "EM101",
+    "EM102",
     "G004",
     "PLR0912",
     "PLR0913",
