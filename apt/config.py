@@ -38,6 +38,19 @@ class Config:
             return dsn
         return None
 
+    @property
+    def workspace_root_dir(self) -> str:
+        """Root workspace directory where temporary directories will be created.
+
+        Locally, this defaults to '/tmp'.  For deployed Lambda, this will default to the
+        EFS mount connected to the Lambda.
+
+        This workspace directory is expected to persist, but all files and directories
+        created here over the course of creating the Bagit zip file are designed to be
+        temporary.
+        """
+        return os.getenv("WORKSPACE_ROOT_DIR", "/tmp")  # noqa: S108
+
 
 def configure_logger(
     root_logger: logging.Logger,

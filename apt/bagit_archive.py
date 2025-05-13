@@ -16,7 +16,7 @@ CONFIG = Config()
 
 
 class BagitArchive:
-    """Class for creating a Bagit archive files."""
+    """Class for creating a Bagit archive zip file."""
 
     DEFAULT_CHECKSUMS: ClassVar[list[str]] = [
         "md5",
@@ -47,6 +47,11 @@ class BagitArchive:
     ) -> dict[str, Any]:
         """Create a new Bagit archive zip file and save to the specified URI.
 
+        A temporary directory will be created for the Bag, which will then be zipped up,
+        and fully removed after copying to target destination.  The workspace for where
+        this temporary directory will be created is defined by CONFIG.workspace_root_dir.
+        For the deployed Lambda, the root workspace will be the connected EFS mount.
+
         Args:
             input_files: List of dicts with 'uri', 'filepath', and optional 'checksums'
             output_zip_uri: URI where to save the final zip file (local path or s3://bucket/key)
@@ -62,9 +67,9 @@ class BagitArchive:
         }
 
         try:
-            # NOTE: Eventually this TemporaryDirectory will be explicitly located in the
-            #   Lambda's EFS mount
-            with tempfile.TemporaryDirectory() as temp_bag_dir:
+            with tempfile.TemporaryDirectory(
+                dir=CONFIG.workspace_root_dir
+            ) as temp_bag_dir:
                 temp_dir_path = Path(temp_bag_dir)
 
                 # download input files

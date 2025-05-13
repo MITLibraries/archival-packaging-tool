@@ -88,5 +88,5 @@ CHALLENGE_SECRET=### Secret string that is passed as part of lambda invocation p
 ### Optional
 
 ```shell
-None yet...
+WORKSPACE_ROOT_DIR=### Root directory where Bagit zip files will be temporarily created, then cleaned up; for deployed Lambda this will be the EFS mount.  Defaults to /tmp.
 ```
