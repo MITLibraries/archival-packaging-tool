@@ -139,3 +139,7 @@ dmypy.json
 .idea/
 
 output/
+
+# SAM
+.aws-sam/
+tests/sam/env.json
