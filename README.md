@@ -88,5 +88,6 @@ CHALLENGE_SECRET=### Secret string that is passed as part of lambda invocation p
 ### Optional
 
 ```shell
-None yet...
+WARNING_ONLY_LOGGERS=### comma separated list of libraries to limit to WARNING logging level
+BAGIT_WORKING_DIR=### Root directory where Bagit zip files will be temporarily created, then cleaned up; for deployed Lambda this will be the EFS mount.  Defaults to /tmp.
 ```

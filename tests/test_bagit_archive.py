@@ -1,4 +1,5 @@
 import shutil
+import tempfile
 import zipfile
 from pathlib import Path
 from unittest.mock import MagicMock, patch
@@ -31,6 +32,20 @@ class TestBagitArchive:
                 },
             }
         ]
+
+    @pytest.fixture
+    def test_bagit_working_dir(self, tmp_path, monkeypatch) -> Path:
+        test_workspace = tmp_path / "test_workspace"
+        test_workspace.mkdir()
+        monkeypatch.setenv("BAGIT_WORKING_DIR", str(test_workspace))
+        return test_workspace
+
+    @pytest.fixture
+    def patched_bagit_archive(self, mocker):
+        bagit_archive = BagitArchive()
+        mock_upload = mocker.patch("apt.bagit_archive.BagitArchive.upload_bag_to_s3")
+        mock_upload.return_value = "s3://fake-bucket/bag.zip"
+        return bagit_archive
 
     def test_init_defaults(self):
         bagit_archive = BagitArchive()
@@ -178,3 +193,39 @@ class TestBagitArchive:
             assert result["success"] is False
             assert result["error"] == "Test error"
             assert "elapsed" in result
+
+    def test_bagit_working_dir_cleaned_up_after_bagit_zip_creation(
+        self, test_bagit_working_dir, patched_bagit_archive
+    ):
+        patched_bagit_archive.process(
+            [{"uri": "tests/fixtures/sample.txt", "filepath": "sample.txt"}],
+            "s3://fake-bucket/bag.zip",
+        )
+
+        # assert that the custom workspace is empty, indicating that
+        # BagitArchive.process successfully cleaned up after the upload
+        assert list(test_bagit_working_dir.glob("*")) == []
+        assert list(test_bagit_working_dir.glob("**/*")) == []
+
+        # assert that the workspace remains
+        assert test_bagit_working_dir.exists()
+
+    def test_bagit_working_dir_used_for_temporary_bagit_directory(
+        self, test_bagit_working_dir, patched_bagit_archive, mocker
+    ):
+        # spy on tempfile.TemporaryDirectory to observe where it's created later
+        temp_dir_spy = mocker.spy(tempfile, "TemporaryDirectory")
+
+        patched_bagit_archive.process(
+            [{"uri": "tests/fixtures/sample.txt", "filepath": "sample.txt"}],
+            "s3://fake-bucket/bag.zip",
+        )
+
+        # assert tempfile.TemporaryDirectory() was called once to create a temporary
+        # Bagit directory in our test workspace
+        assert temp_dir_spy.call_count == 1
+
+        # assert that our test_workspace was the *root* of the temporary directory created
+        temp_dir_call_args = temp_dir_spy.call_args_list[0]
+        temp_dir_path = temp_dir_call_args[1].get("dir")
+        assert temp_dir_path.startswith(str(test_bagit_working_dir))

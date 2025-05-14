@@ -15,7 +15,10 @@ class Config:
         "SENTRY_DSN",
         "CHALLENGE_SECRET",
     )
-    OPTIONAL_ENV_VARS = ()
+    OPTIONAL_ENV_VARS = (
+        "WARNING_ONLY_LOGGERS",
+        "BAGIT_WORKING_DIR",
+    )
 
     def __getattr__(self, name: str) -> Any:  # noqa: ANN401
         """Provide dot notation access to configurations and env vars on this class."""
@@ -37,6 +40,19 @@ class Config:
         if dsn and dsn.strip().lower() != "none":
             return dsn
         return None
+
+    @property
+    def bagit_working_dir(self) -> str:
+        """Root workspace directory where temporary directories will be created.
+
+        Locally, this defaults to '/tmp'.  For deployed Lambda, this will default to the
+        EFS mount connected to the Lambda.
+
+        This workspace directory is expected to persist, but all files and directories
+        created here over the course of creating the Bagit zip file are designed to be
+        temporary.
+        """
+        return os.getenv("BAGIT_WORKING_DIR", "/tmp")  # noqa: S108
 
 
 def configure_logger(
