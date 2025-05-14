@@ -8,7 +8,6 @@ bagit = "*"
 boto3 = "*"
 sentry-sdk = "*"
 setuptools = "*"
-smart-open = {extras = ["s3"], version = "*"}
 jsonschema = "*"
 
 [dev-packages]
@@ -22,6 +21,7 @@ pytest = "*"
 ruff = "*"
 types-jsonschema = "*"
 pytest-mock = "*"
+boto3-stubs = "*"
 
 [requires]
 python_version = "3.12"
