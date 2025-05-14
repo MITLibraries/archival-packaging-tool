@@ -17,7 +17,7 @@ class Config:
     )
     OPTIONAL_ENV_VARS = (
         "WARNING_ONLY_LOGGERS",
-        "WORKSPACE_ROOT_DIR",
+        "BAGIT_WORKING_DIR",
     )
 
     def __getattr__(self, name: str) -> Any:  # noqa: ANN401
@@ -42,7 +42,7 @@ class Config:
         return None
 
     @property
-    def workspace_root_dir(self) -> str:
+    def bagit_working_dir(self) -> str:
         """Root workspace directory where temporary directories will be created.
 
         Locally, this defaults to '/tmp'.  For deployed Lambda, this will default to the
@@ -52,7 +52,7 @@ class Config:
         created here over the course of creating the Bagit zip file are designed to be
         temporary.
         """
-        return os.getenv("WORKSPACE_ROOT_DIR", "/tmp")  # noqa: S108
+        return os.getenv("BAGIT_WORKING_DIR", "/tmp")  # noqa: S108
 
 
 def configure_logger(

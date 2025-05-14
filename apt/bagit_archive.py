@@ -49,7 +49,7 @@ class BagitArchive:
 
         A temporary directory will be created for the Bag, which will then be zipped up,
         and fully removed after copying to target destination.  The workspace for where
-        this temporary directory will be created is defined by CONFIG.workspace_root_dir.
+        this temporary directory will be created is defined by CONFIG.bagit_working_dir.
         For the deployed Lambda, the root workspace will be the connected EFS mount.
 
         Args:
@@ -68,7 +68,7 @@ class BagitArchive:
 
         try:
             with tempfile.TemporaryDirectory(
-                dir=CONFIG.workspace_root_dir
+                dir=CONFIG.bagit_working_dir
             ) as temp_bag_dir:
                 temp_dir_path = Path(temp_bag_dir)
 

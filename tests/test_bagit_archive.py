@@ -34,10 +34,10 @@ class TestBagitArchive:
         ]
 
     @pytest.fixture
-    def test_workspace_root_dir(self, tmp_path, monkeypatch) -> Path:
+    def test_bagit_working_dir(self, tmp_path, monkeypatch) -> Path:
         test_workspace = tmp_path / "test_workspace"
         test_workspace.mkdir()
-        monkeypatch.setenv("WORKSPACE_ROOT_DIR", str(test_workspace))
+        monkeypatch.setenv("BAGIT_WORKING_DIR", str(test_workspace))
         return test_workspace
 
     @pytest.fixture
@@ -194,8 +194,8 @@ class TestBagitArchive:
             assert result["error"] == "Test error"
             assert "elapsed" in result
 
-    def test_workspace_root_dir_cleaned_up_after_bagit_zip_creation(
-        self, test_workspace_root_dir, patched_bagit_archive
+    def test_bagit_working_dir_cleaned_up_after_bagit_zip_creation(
+        self, test_bagit_working_dir, patched_bagit_archive
     ):
         patched_bagit_archive.process(
             [{"uri": "tests/fixtures/sample.txt", "filepath": "sample.txt"}],
@@ -204,14 +204,14 @@ class TestBagitArchive:
 
         # assert that the custom workspace is empty, indicating that
         # BagitArchive.process successfully cleaned up after the upload
-        assert list(test_workspace_root_dir.glob("*")) == []
-        assert list(test_workspace_root_dir.glob("**/*")) == []
+        assert list(test_bagit_working_dir.glob("*")) == []
+        assert list(test_bagit_working_dir.glob("**/*")) == []
 
         # assert that the workspace remains
-        assert test_workspace_root_dir.exists()
+        assert test_bagit_working_dir.exists()
 
-    def test_workspace_root_dir_used_for_temporary_bagit_directory(
-        self, test_workspace_root_dir, patched_bagit_archive, mocker
+    def test_bagit_working_dir_used_for_temporary_bagit_directory(
+        self, test_bagit_working_dir, patched_bagit_archive, mocker
     ):
         # spy on tempfile.TemporaryDirectory to observe where it's created later
         temp_dir_spy = mocker.spy(tempfile, "TemporaryDirectory")
@@ -228,4 +228,4 @@ class TestBagitArchive:
         # assert that our test_workspace was the *root* of the temporary directory created
         temp_dir_call_args = temp_dir_spy.call_args_list[0]
         temp_dir_path = temp_dir_call_args[1].get("dir")
-        assert temp_dir_path.startswith(str(test_workspace_root_dir))
+        assert temp_dir_path.startswith(str(test_bagit_working_dir))
