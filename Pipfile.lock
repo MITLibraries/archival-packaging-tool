@@ -324,20 +324,20 @@
         },
         "boto3-stubs": {
             "hashes": [
-                "sha256:0be0b5857d080de92c6b40b35950c62224c50858b26a530cdebfad9802cd467f",
-                "sha256:b4c28839868f4a6b6d1004b2993f6054e33bc2c635eb6dd170ce93bb75842f4f"
+                "sha256:04f0076b30218266178e9b99eb7156778f3a6242092064d545df7de88264fbd5",
+                "sha256:259fee3520b5d728193587cf3ab1619e7e12d2a4e9b4be7786d5d0de6672754b"
             ],
             "index": "pypi",
             "markers": "python_version >= '3.8'",
-            "version": "==1.38.15"
+            "version": "==1.38.17"
         },
         "botocore-stubs": {
             "hashes": [
-                "sha256:db621e8378776e04716adcd61a13996ecd5574b6e46bec8ecc0c3054122a7a08",
-                "sha256:f84a6efc7b9554fecdf4d875909a28bc8bd63a7def23dd5ceadb5b7759ea0524"
+                "sha256:683701be2fc5a7d8aaa7cbf2fbd838f2065512a3903e93aa5acdf27143333b00",
+                "sha256:9a09c18d075df6d4afd5c9fb5adb69fc74cb639d36e328d143be9d3419ab6264"
             ],
             "markers": "python_version >= '3.8'",
-            "version": "==1.38.15"
+            "version": "==1.38.17"
         },
         "cachecontrol": {
             "extras": [
@@ -1234,11 +1234,11 @@
         },
         "types-awscrt": {
             "hashes": [
-                "sha256:3c2bee52ee45022daaf4f106d5d1b5f0ff0a8e3e6093dda65f5315b7669bc418",
-                "sha256:e86b83d0fd8c770f985b8c458c28e232dae9adee0689d0a9671868a8bf397b0a"
+                "sha256:49a045f25bbd5ad2865f314512afced933aed35ddbafc252e2268efa8a787e4e",
+                "sha256:acd04f57119eb15626ab0ba9157fc24672421de56e7bd7b9f61681fedee44e91"
             ],
             "markers": "python_version >= '3.8'",
-            "version": "==0.27.1"
+            "version": "==0.27.2"
         },
         "types-jsonschema": {
             "hashes": [
