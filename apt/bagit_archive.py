@@ -71,18 +71,19 @@ class BagitArchive:
                 dir=CONFIG.bagit_working_dir
             ) as temp_bag_dir:
                 temp_dir_path = Path(temp_bag_dir)
+                local_bag_path = temp_dir_path / "bag"
+                local_zip_path = temp_dir_path / "bag.zip"
 
                 # download input files
-                self.download_files(input_files, temp_dir_path)
+                self.download_files(input_files, local_bag_path)
 
                 # create Bag
-                bag = self.create_bag(temp_dir_path, checksums=checksums)
+                bag = self.create_bag(local_bag_path, checksums=checksums)
 
                 # validate any checksums passed with input files after Bag creation
                 self.validate_checksums(input_files, bag)
 
                 # create local Bag zip file
-                local_zip_path = Path(temp_bag_dir) / "bag.zip"
                 self.create_zip(local_zip_path, compress=compress_zip)
 
                 # upload Bag zip file to target location
