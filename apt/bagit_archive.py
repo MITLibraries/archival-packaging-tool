@@ -27,7 +27,7 @@ class BagitArchive:
         self,
         bag_metadata: dict | None = None,
     ):
-        self.bag_metadata = bag_metadata or {"Contact-Name": "Default Contact"}
+        self.bag_metadata = bag_metadata or {}
         self.bag = None
 
     @property
