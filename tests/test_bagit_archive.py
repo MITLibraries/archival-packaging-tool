@@ -64,6 +64,10 @@ class TestBagitArchive:
             bagit_archive.download_file(str(sample_file_path), target_path)
             mock_transfer.assert_called_once_with(str(sample_file_path), target_path)
 
+    def test_init_no_metadata(self):
+        bagit_archive = BagitArchive()
+        assert bagit_archive.bag_metadata == {}
+
     def test_download_files(self, tmp_path, input_files):
         bagit_archive = BagitArchive()
 
