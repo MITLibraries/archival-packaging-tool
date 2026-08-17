@@ -123,7 +123,7 @@ class TestBagitArchive:
             }
         ]
 
-        with pytest.raises(ValueError, match="Checksum mismatch for data/file.txt"):
+        with pytest.raises(ValueError, match=r"Checksum mismatch for data/file\.txt"):
             bagit_archive.validate_checksums(input_files, mock_bag)
 
     def test_create_zip(self, tmp_path):

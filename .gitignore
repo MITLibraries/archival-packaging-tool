@@ -143,3 +143,7 @@ output/
 # SAM
 .aws-sam/
 tests/sam/env.json
+
+# Container build metadata and local Python version manager configuration
+.arch_tag
+.tool-versions

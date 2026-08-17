@@ -1,26 +1,22 @@
-### This is the Terraform-generated prod-promote.yml workflow for the archival-packaging-tool-prod repository. ###
-### If this is a Lambda repo, uncomment the FUNCTION line at the end of the document.         ###
-name: Prod Container Promote
-
-# checkov:skip=CKV2_GHA_1:The shared workflow contains the permissions constraints
-# NOTE: The above checkov skip command doesn't actually work and this workflow
-#       will always show a checkov warning.
-
+name: Prod Image Promote
 on:
   workflow_dispatch:
   release:
     types: [published]
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
-  deploy:
-    name: Prod Container Promote
-    uses: mitlibraries/.github/.github/workflows/ecr-shared-promote-prod.yml@main
+  promote:
+    name: Prod Promote
+    uses: mitlibraries/.github/.github/workflows/ecr-multi-arch-promote-prod.yml@main
     secrets: inherit
     with:
-      AWS_REGION: "us-east-1"
+      AWS_REGION: us-east-1
       GHA_ROLE_STAGE: archival-packaging-tool-gha-stage
       GHA_ROLE_PROD: archival-packaging-tool-gha-prod
-      ECR_STAGE: "archival-packaging-tool-stage"
-      ECR_PROD: "archival-packaging-tool-prod"
-      FUNCTION: "archival-packaging-tool-prod"
- 
+      ECR_STAGE: archival-packaging-tool-stage
+      ECR_PROD: archival-packaging-tool-prod
+      FUNCTION: archival-packaging-tool-dev

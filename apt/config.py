@@ -1,5 +1,6 @@
 import logging
 import os
+from pathlib import Path
 from typing import Any
 
 import sentry_sdk
@@ -52,7 +53,9 @@ class Config:
         created here over the course of creating the Bagit zip file are designed to be
         temporary.
         """
-        return os.getenv("BAGIT_WORKING_DIR", "/tmp")  # noqa: S108
+        workspace = Path(os.getenv("BAGIT_WORKING_DIR", "/tmp"))  # noqa: S108
+        workspace.mkdir(parents=True, exist_ok=True)
+        return str(workspace)
 
 
 def configure_logger(
