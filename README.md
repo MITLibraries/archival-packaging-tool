@@ -9,6 +9,8 @@ A tool for creating a Bagit zip file.
 - To update dependencies: `make update`
 - To run unit tests: `make test`
 - To lint the repo: `make lint`
+- To apply formatting and supported lint fixes: `make lint-fix`
+- To scan dependencies for known vulnerabilities: `make security`
 
 ## Testing Locally with AWS SAM
 
@@ -25,7 +27,7 @@ All following actions and commands should be performed from the root of the proj
 - copy `tests/sam/env.json.template` to `tests/sam/env.json` (which is git ignored)
 - fill in missing sensitive env vars
 
-**NOTE:** AWS credentials are automatically passed from the terminal context that runs `make sam-run`; they do not need to be explicitly set as env vars.
+**NOTE:** AWS credentials are automatically passed from the terminal context that runs `make sam-build`, `make sam-invoke`, or SAM commands; they do not need to be explicitly set as env vars.
 
 2- Build Docker image:
 ```shell
@@ -59,10 +61,10 @@ Response should have an HTTP status of `200` and respond with:
 
 ### Invoking Lambda directly
 
-While Lambdas can be invoked via HTTP methods (ALB, Function URL, etc.), they are also often invoked directly with an `event` payload.  To do so with SAM, you do **not** need to first start an HTTP server with `make sam-run`, you can invoke the function image directly:
+While Lambdas can be invoked via HTTP methods (ALB, Function URL, etc.), they are also often invoked directly with an `event` payload.  To do so with SAM, you do **not** need to first start an HTTP server with `make sam-http-run`; use the direct SAM invocation target:
 
 ```shell
-echo '{"action": "ping","challenge_secret":"totally-local-archival-packaging"}' | sam local invoke -e -
+make sam-invoke
 ```
 
 Response:

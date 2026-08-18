@@ -7,6 +7,7 @@ This tool will be deployed as an AWS Lambda, and the expected primary way of inv
 Example JSON payload sent via a `POST` request:
 ```json
 {
+    "action": "create-bagit-zip",
     "challenge_secret": "abc123def456",
     "verbose": true,
     "metadata": {
@@ -42,6 +43,9 @@ Example JSON payload sent via a `POST` request:
 }
 ```
 ### Fields
+- `action`: **REQUIRED** operation to perform
+  - use `"create-bagit-zip"` to create a BagIt zip archive
+  - use `"ping"` to verify that the service is available; this action does not require the archive-creation fields
 - `challenge_secret`: **REQUIRED** shared, secret string confirmed by the Lambda before processing request
 - `verbose`: **OPTIONAL** boolean for verbose logging and response
 - `metadata`: **OPTIONAL** object of key:value pairs that getting written as metadata to `bagit-info.txt`
