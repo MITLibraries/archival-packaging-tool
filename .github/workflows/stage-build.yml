@@ -20,5 +20,5 @@ jobs:
       AWS_REGION: us-east-1
       GHA_ROLE: archival-packaging-tool-gha-stage
       ECR: archival-packaging-tool-stage
-      FUNCTION: archival-packaging-tool-dev
+      FUNCTION: archival-packaging-tool-stage
       # PREBUILD: # Only if a pre-build dependency is required.

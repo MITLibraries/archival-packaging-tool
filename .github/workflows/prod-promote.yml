@@ -19,4 +19,4 @@ jobs:
       GHA_ROLE_PROD: archival-packaging-tool-gha-prod
       ECR_STAGE: archival-packaging-tool-stage
       ECR_PROD: archival-packaging-tool-prod
-      FUNCTION: archival-packaging-tool-dev
+      FUNCTION: archival-packaging-tool-prod
