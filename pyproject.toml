@@ -58,6 +58,8 @@ ignore = [
   "PLR0913",
   "PLR0915",
   "S321",
+  "TD002",
+  "TD003",
   # Existing source and tests predate the project's copyright-header convention.
   "CPY001",
   # The following rules are retained for established application patterns.
